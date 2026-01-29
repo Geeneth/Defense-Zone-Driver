@@ -1,0 +1,22 @@
+{
+  "name": "multiplayer-phaser-rts",
+  "version": "1.0.0",
+  "description": "Multiplayer RTS game with Phaser and Socket.IO",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "npm run build:shared && npm run build:server && npm run build:client",
+    "build:shared": "cd shared && npm run build",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
