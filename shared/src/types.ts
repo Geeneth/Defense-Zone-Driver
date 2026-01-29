@@ -100,14 +100,14 @@ export const GAME_CONFIG = {
   PLAYER_SPEED: 200,
   TICK_RATE: 60,
   COLORS: [
-    '#FF6B6B', // Red
-    '#4ECDC4', // Cyan
-    '#45B7D1', // Blue
-    '#FFA07A', // Light Salmon
-    '#98D8C8', // Mint
-    '#F7DC6F', // Yellow
-    '#BB8FCE', // Purple
-    '#85C1E2', // Sky Blue
+    '#ff6b35', // Vibrant Orange
+    '#ffffff', // Pure White
+    '#ff3333', // Bright Red
+    '#ffcc00', // Golden Yellow
+    '#00ffff', // Cyan
+    '#ff00ff', // Magenta
+    '#00ff00', // Lime Green
+    '#cccccc', // Light Gray
   ],
   
   // RTS Tower Defense

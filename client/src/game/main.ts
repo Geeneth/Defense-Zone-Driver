@@ -7,13 +7,15 @@ export function startGame(containerId: string, serverUrl: string): Phaser.Game {
     width: 800,
     height: 600,
     parent: containerId,
-    backgroundColor: '#2d2d2d',
-    pixelArt: true, // Enable pixel-perfect rendering
+    backgroundColor: '#000000',
+    pixelArt: true,
     antialias: false,
     roundPixels: true,
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: 800,
+      height: 600,
     },
     physics: {
       default: 'arcade',
