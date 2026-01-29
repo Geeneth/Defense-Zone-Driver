@@ -95,6 +95,23 @@ export class GameRoom {
       return null;
     }
 
+    // Check if player already has 3 buildings (max limit)
+    const playerBuildingCount = Array.from(this.buildings.values()).filter(
+      building => building.ownerId === ownerId
+    ).length;
+    
+    if (playerBuildingCount >= 3) {
+      console.log(`Cannot build: Player ${ownerId} already has 3 buildings`);
+      return null;
+    }
+
+    // Get player's color for the building
+    const player = this.players.get(ownerId);
+    if (!player) {
+      console.log(`Cannot build: Player ${ownerId} not found`);
+      return null;
+    }
+
     // Check if building would overlap with central building
     const centralHalfSize = this.centralBuilding.size / 2;
     const buildingHalfSize = GAME_CONFIG.BUILDING_SIZE / 2;
@@ -138,6 +155,7 @@ export class GameRoom {
       hp: GAME_CONFIG.BUILDING_HP,
       maxHp: GAME_CONFIG.BUILDING_HP,
       ownerId,
+      color: player.color,
     };
 
     this.buildings.set(building.id, building);
@@ -400,16 +418,19 @@ export class GameRoom {
       });
 
       // If there's an enemy in range, shoot at it
-      if (closestEnemy) {
+      if (closestEnemy !== null) {
         const lastAttack = this.buildingAttackCooldowns.get(buildingId) || 0;
         if (now - lastAttack >= GAME_CONFIG.BUILDING_ATTACK_COOLDOWN) {
+          // Cast to Enemy to fix type narrowing issue
+          const targetEnemy = closestEnemy as Enemy;
+          
           // Create projectile
           const projectile: Projectile = {
             id: `projectile_${this.projectileIdCounter++}`,
             x: building.x,
             y: building.y,
-            targetX: closestEnemy.x,
-            targetY: closestEnemy.y,
+            targetX: targetEnemy.x,
+            targetY: targetEnemy.y,
             speed: GAME_CONFIG.PROJECTILE_SPEED,
             sourceId: buildingId,
           };

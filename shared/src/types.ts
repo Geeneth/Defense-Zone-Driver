@@ -33,6 +33,7 @@ export interface Building {
   hp: number;
   maxHp: number;
   ownerId: string; // player who placed it
+  color: string; // owner's color
 }
 
 export interface Projectile {

@@ -1,6 +1,6 @@
 # Fly.io configuration for multiplayer game server
 
-app = "rts-game"
+app = "defense-zone"
 primary_region = "sjc"
 
 [build]
