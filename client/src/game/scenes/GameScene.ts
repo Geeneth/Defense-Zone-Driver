@@ -28,6 +28,8 @@ export class GameScene extends Phaser.Scene {
   };
   private gridGraphics!: Phaser.GameObjects.Graphics;
   private statusText!: Phaser.GameObjects.Text;
+  private towerStatusText!: Phaser.GameObjects.Text;
+  private ownedTowerCount: number = 0;
   
   // RTS entities
   private centralBuildingGraphics!: Phaser.GameObjects.Graphics;
@@ -71,6 +73,19 @@ export class GameScene extends Phaser.Scene {
       strokeThickness: 3,
     });
     this.statusText.setDepth(1000);
+
+    // Tower status text (left side)
+    this.towerStatusText = this.add.text(10, 40, '', {
+      fontSize: '13px',
+      color: '#ffcc00',
+      fontFamily: 'monospace',
+      fontStyle: 'bold',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 },
+      stroke: '#000000',
+      strokeThickness: 3,
+    });
+    this.towerStatusText.setDepth(1000);
 
     // Initialize Socket.IO connection
     this.initializeSocket();
@@ -462,6 +477,22 @@ export class GameScene extends Phaser.Scene {
     this.renderBuildings(gameState.buildings);
     this.renderProjectiles(gameState.projectiles);
 
+    // Update tower status for the local player
+    const maxTowers =
+      // Fallback for older builds that may not include the new constant
+      (GAME_CONFIG as any).MAX_BUILDINGS_PER_PLAYER ?? 3;
+    let ownedTowers = 0;
+    if (this.localPlayerId) {
+      ownedTowers = Object.values(gameState.buildings).filter(
+        (b) => b.ownerId === this.localPlayerId
+      ).length;
+    }
+    this.ownedTowerCount = ownedTowers;
+    const towersLeft = Math.max(0, maxTowers - ownedTowers);
+    this.towerStatusText.setText(
+      `Defense Towers: ${towersLeft}/${maxTowers} left`
+    );
+
     // Update status text
     const playerCount = Object.keys(gameState.players).length;
     const enemyCount = Object.keys(gameState.enemies).length;
@@ -511,9 +542,13 @@ export class GameScene extends Phaser.Scene {
     // Handle building placement with space bar
     if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
       if (this.currentMatchPhase === GamePhase.RUNNING && this.localPlayerId) {
-        const localPlayer = this.players.get(this.localPlayerId);
-        if (localPlayer) {
-          this.placeBuilding(localPlayer.x, localPlayer.y);
+        const maxTowers =
+          (GAME_CONFIG as any).MAX_BUILDINGS_PER_PLAYER ?? 3;
+        if (this.ownedTowerCount < maxTowers) {
+          const localPlayer = this.players.get(this.localPlayerId);
+          if (localPlayer) {
+            this.placeBuilding(localPlayer.x, localPlayer.y);
+          }
         }
       }
     }

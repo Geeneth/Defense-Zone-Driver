@@ -107,6 +107,112 @@
       pointer-events: none;
     }
 
+    .help-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 150;
+      padding: 8px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ff6b35;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #ff6b35;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+    }
+
+    .help-button:hover {
+      background: rgba(255, 107, 53, 0.1);
+    }
+
+    .help-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 999;
+      display: none;
+    }
+
+    .help-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(480px, 90vw);
+      background: #050505;
+      border: 2px solid #ff6b35;
+      box-shadow: 0 0 18px rgba(255, 107, 53, 0.9);
+      padding: 20px 22px 18px;
+      z-index: 1000;
+      display: none;
+      color: #f2f2f2;
+      font-family: 'Courier New', monospace;
+    }
+
+    .help-modal h2 {
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #ff6b35;
+      text-transform: uppercase;
+    }
+
+    .help-modal p {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+
+    .help-modal ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 8px 0 10px;
+      font-size: 0.8rem;
+    }
+
+    .help-modal li::before {
+      content: '▸ ';
+      color: #ff6b35;
+    }
+
+    .help-modal-footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .help-close-btn,
+    .help-start-btn {
+      padding: 6px 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #ff6b35;
+      background: transparent;
+      color: #ff6b35;
+      text-transform: uppercase;
+    }
+
+    .help-start-btn {
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+
+    .help-close-btn:hover {
+      background: rgba(255, 107, 53, 0.18);
+    }
+
+    .help-start-btn:hover {
+      background: rgba(0, 255, 136, 0.18);
+    }
+
     .retro-scanlines {
       position: fixed;
       top: 0;
@@ -150,6 +256,8 @@
 <body>
   <div class="retro-scanlines"></div>
   
+  <button class="help-button" id="help-button">HELP</button>
+  
   <div class="title-container">
     <pre class="ascii-title">
 ██████  ███████ ███████ ███████ ███    ██ ███████ ███████ 
@@ -171,7 +279,32 @@
   </div>
   
   <div class="info">
-    <p>WASD / Arrows: Move • SPACE: Build Tower • R: Ready Up</p>
+    <p>
+      WASD / Arrows: Move • SPACE: Build Tower • R: Ready Up •
+      Multiplayer: share this link and defend together!
+    </p>
+  </div>
+
+  <div class="help-backdrop" id="help-backdrop"></div>
+  <div class="help-modal" id="help-modal">
+    <h2>DEFENSE ZONE — MISSION BRIEFING</h2>
+    <p><strong>Main Aim:</strong> Work with other players to protect the glowing central base from endless enemy waves.</p>
+    <ul>
+      <li>Move using <strong>WASD / Arrow Keys</strong> or gesture controls.</li>
+      <li>Press <strong>SPACE</strong> to drop a defense tower where you stand (limited per player).</li>
+      <li>Place towers so their firing ranges overlap and cover different angles.</li>
+      <li>Keep the central base HP above zero to survive waves and collect points.</li>
+      <li>This is a <strong>multiplayer</strong> game — open more tabs or invite friends to join the same arena.</li>
+    </ul>
+    <p>When the central base is destroyed, everyone can press <strong>R</strong> to ready up and start a fresh round.</p>
+    <p><em>Tip:</em> Coordinate with your squad so each player defends a different side of the map.</p>
+    <div class="help-modal-footer">
+      <span>All the best, Commander!</span>
+      <div>
+        <button class="help-close-btn" id="help-close">Close</button>
+        <button class="help-start-btn" id="help-start">Let&apos;s go</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -199,6 +332,45 @@
         loading.style.color = '#ff6b6b';
       }
     });
+    
+    // Help / mission briefing modal behaviour
+    const helpButton = document.getElementById('help-button');
+    const helpBackdrop = document.getElementById('help-backdrop');
+    const helpModal = document.getElementById('help-modal');
+    const helpClose = document.getElementById('help-close');
+    const helpStart = document.getElementById('help-start');
+
+    function openHelp() {
+      if (helpBackdrop && helpModal) {
+        helpBackdrop.style.display = 'block';
+        helpModal.style.display = 'block';
+      }
+    }
+
+    function closeHelp() {
+      if (helpBackdrop && helpModal) {
+        helpBackdrop.style.display = 'none';
+        helpModal.style.display = 'none';
+      }
+    }
+
+    // Show briefing once when the page loads, before the first game
+    window.addEventListener('load', () => {
+      openHelp();
+    });
+
+    if (helpButton) {
+      helpButton.addEventListener('click', () => openHelp());
+    }
+    if (helpBackdrop) {
+      helpBackdrop.addEventListener('click', () => closeHelp());
+    }
+    if (helpClose) {
+      helpClose.addEventListener('click', () => closeHelp());
+    }
+    if (helpStart) {
+      helpStart.addEventListener('click', () => closeHelp());
+    }
   </script>
   <script is:inline src="/gesture-input.js"></script>
 </body>

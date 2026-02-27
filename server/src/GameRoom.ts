@@ -29,6 +29,9 @@ export class GameRoom {
   private enemyAttackCooldowns: Map<string, number> = new Map();
   private buildingAttackCooldowns: Map<string, number> = new Map();
 
+  // Track how many active buildings each player owns
+  private playerBuildingCounts: Map<string, number> = new Map();
+
   constructor() {
     this.centralBuilding = this.createCentralBuilding();
   }
@@ -95,13 +98,12 @@ export class GameRoom {
       return null;
     }
 
-    // Check if player already has 3 buildings (max limit)
-    const playerBuildingCount = Array.from(this.buildings.values()).filter(
-      building => building.ownerId === ownerId
-    ).length;
-    
-    if (playerBuildingCount >= 3) {
-      console.log(`Cannot build: Player ${ownerId} already has 3 buildings`);
+    // Check if player already has the maximum number of buildings allowed
+    const currentCount = this.playerBuildingCounts.get(ownerId) ?? 0;
+    if (currentCount >= GAME_CONFIG.MAX_BUILDINGS_PER_PLAYER) {
+      console.log(
+        `Cannot build: Player ${ownerId} already has ${currentCount} buildings (max ${GAME_CONFIG.MAX_BUILDINGS_PER_PLAYER})`
+      );
       return null;
     }
 
@@ -159,6 +161,7 @@ export class GameRoom {
     };
 
     this.buildings.set(building.id, building);
+    this.playerBuildingCounts.set(ownerId, currentCount + 1);
     return building;
   }
 
@@ -185,6 +188,7 @@ export class GameRoom {
     this.projectiles.clear();
     this.enemyAttackCooldowns.clear();
     this.buildingAttackCooldowns.clear();
+    this.playerBuildingCounts.clear();
 
     // Reset central building
     this.centralBuilding = this.createCentralBuilding();
@@ -231,8 +235,10 @@ export class GameRoom {
   }
 
   update(deltaTime: number): void {
-    // Update player positions based on input
-    this.updatePlayers(deltaTime);
+    // Update player positions based on input only while match is running
+    if (this.matchPhase === GamePhase.RUNNING) {
+      this.updatePlayers(deltaTime);
+    }
 
     // Only run game logic if in running phase
     if (this.matchPhase === GamePhase.RUNNING) {
@@ -386,8 +392,18 @@ export class GameRoom {
       }
     });
 
-    // Clean up destroyed buildings
+    // Clean up destroyed buildings and update owner counts
     buildingsToRemove.forEach(id => {
+      const building = this.buildings.get(id);
+      if (building) {
+        const current = this.playerBuildingCounts.get(building.ownerId) ?? 0;
+        const next = Math.max(0, current - 1);
+        if (next === 0) {
+          this.playerBuildingCounts.delete(building.ownerId);
+        } else {
+          this.playerBuildingCounts.set(building.ownerId, next);
+        }
+      }
       this.buildings.delete(id);
     });
 

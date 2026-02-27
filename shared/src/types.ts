@@ -136,4 +136,7 @@ export const GAME_CONFIG = {
     { x: 50, y: 550 },
     { x: 750, y: 550 },
   ],
+
+  // Per-player limit for defense towers
+  MAX_BUILDINGS_PER_PLAYER: 3,
 } as const;

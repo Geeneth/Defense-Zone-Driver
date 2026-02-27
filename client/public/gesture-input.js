@@ -299,8 +299,16 @@
     await camera.start();
 
     gestureActive = true;
+
+    // On larger screens, show camera by default.
+    // On small screens (e.g. mobile), keep the camera hidden until the user chooses to show it.
+    const isSmallScreen = window.innerWidth < 768;
+    overlayVisible = !isSmallScreen;
     overlayContainer.style.display = overlayVisible ? 'block' : 'none';
+
     toggleBtn.style.display = 'block';
+    toggleBtn.textContent = overlayVisible ? 'Hide cam' : 'Show cam';
+
     statusLabel.textContent = 'ON';
     controlBtn.classList.add('active');
     return true;
@@ -326,8 +334,18 @@
   // ── UI Creation ────────────────────────────────────────────────────────
   const styles = document.createElement('style');
   styles.textContent = `
+    #gesture-wrapper {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      max-width: 260px;
+    }
     #gesture-overlay-container {
-      position: fixed; top: 10px; right: 10px; z-index: 9999;
       width: ${OVERLAY_W}px; height: ${OVERLAY_H}px;
       border: 2px solid #00ff88; border-radius: 6px;
       overflow: hidden; opacity: 0.85;
@@ -339,7 +357,6 @@
       background: #111;
     }
     #gesture-toggle-btn {
-      position: fixed; top: ${OVERLAY_H + 18}px; right: 10px; z-index: 9999;
       background: rgba(0,0,0,0.7); color: #00ff88;
       border: 1px solid #00ff88; border-radius: 4px;
       font: bold 11px 'Courier New', monospace; padding: 3px 8px;
@@ -363,13 +380,41 @@
       background: #555; transition: background 0.2s;
     }
     #gesture-control-btn.active #gesture-indicator { background: #00ff88; }
+    #gesture-instructions {
+      background: rgba(0,0,0,0.8);
+      color: #cccccc;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font: 10px 'Courier New', monospace;
+      padding: 6px 8px;
+      max-width: 220px;
+      line-height: 1.3;
+    }
   `;
   document.head.appendChild(styles);
+
+  // Wrapper for instructions, camera, and toggle (bottom-right)
+  const wrapper = document.createElement('div');
+  wrapper.id = 'gesture-wrapper';
+  document.body.appendChild(wrapper);
+
+  // Gesture instructions above camera
+  const instructionsBox = document.createElement('div');
+  instructionsBox.id = 'gesture-instructions';
+  instructionsBox.innerHTML = [
+    'GESTURE CONTROLS:',
+    '• Index UP → Move up (W / ↑)',
+    '• Index DOWN → Move down (S / ↓)',
+    '• Index LEFT → Move left (A / ←)',
+    '• Index RIGHT → Move right (D / →)',
+    '• Five fingers spread → Build tower (SPACE)',
+  ].join('<br>');
+  wrapper.appendChild(instructionsBox);
 
   // Overlay
   const overlayContainer = document.createElement('div');
   overlayContainer.id = 'gesture-overlay-container';
-  document.body.appendChild(overlayContainer);
+  wrapper.appendChild(overlayContainer);
 
   overlayCanvas = document.createElement('canvas');
   overlayCanvas.id = 'gesture-overlay-canvas';
@@ -387,7 +432,7 @@
     overlayContainer.style.display = overlayVisible ? 'block' : 'none';
     toggleBtn.textContent = overlayVisible ? 'Hide cam' : 'Show cam';
   });
-  document.body.appendChild(toggleBtn);
+  wrapper.appendChild(toggleBtn);
 
   // Main ON/OFF control
   const controlBtn = document.createElement('button');
