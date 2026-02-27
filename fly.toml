@@ -1,6 +1,6 @@
 # Fly.io configuration for multiplayer game server
 
-app = "defense-zone"
+app = "defense-zone-driver"
 primary_region = "sjc"
 
 [build]
@@ -21,8 +21,8 @@ primary_region = "sjc"
 
   [[http_service.checks]]
     interval = "15s"
-    timeout = "5s"
-    grace_period = "10s"
+    timeout = "10s"
+    grace_period = "60s"
     method = "GET"
     path = "/health"
 
