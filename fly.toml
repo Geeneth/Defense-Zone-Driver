@@ -1,32 +1,23 @@
-# Fly.io configuration for multiplayer game server
+# fly.toml app configuration file generated for play-defense-zone on 2026-02-27T08:22:02Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "defense-zone-driver"
-primary_region = "sjc"
+app = 'play-defense-zone'
+primary_region = 'sjc'
 
 [build]
-  [build.args]
-    NODE_VERSION = "20"
-
-[env]
-  PORT = "8080"
-  NODE_ENV = "production"
 
 [http_service]
-  internal_port = 8080
+  internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
-
-  [[http_service.checks]]
-    interval = "15s"
-    timeout = "10s"
-    grace_period = "60s"
-    method = "GET"
-    path = "/health"
+  processes = ['app']
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 256
