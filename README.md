@@ -99,7 +99,7 @@ fly logs
 
 1. Open the game in your browser (or share the live link with friends).
 2. Use **WASD** or **Arrow Keys** — or enable gesture controls — to move your commander.
-3. Press **SPACE** to place a defense tower where you are standing (each player has a limited number).
+3. Press **SPACE** to place a defense tower where you are standing (each player can have up to **3 towers** alive at once).
 4. Work together to keep the central base HP above zero while enemies stream in from the edges.
 5. When the base falls, everyone can press **R** to ready up and start a new round.
 
