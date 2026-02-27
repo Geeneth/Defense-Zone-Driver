@@ -1,6 +1,6 @@
 # Fly.io configuration for multiplayer game server
 
-app = "defense-zone"
+app = "defense-zone-driver"
 primary_region = "sjc"
 
 [build]
